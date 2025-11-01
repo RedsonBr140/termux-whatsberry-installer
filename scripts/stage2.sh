@@ -1,39 +1,55 @@
 #!/bin/bash
 set -e
 
-echo "Stage 2: Inside debian proot-distro"
+# Define colors and prefixes
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+INFO="${CYAN}[INFO]${NC}"
+SUCCESS="${GREEN}[SUCCESS]${NC}"
+ERROR="${RED}[ERROR]${NC}"
+
+echo -e "${CYAN}[STAGE] Stage 2: Inside Debian proot-distro${NC}"
 
 # --- Update & upgrade ---
-echo "Updating system..."
+echo -e "${INFO} Updating system..."
 apt update && apt upgrade -y
+echo -e "${SUCCESS} System updated."
 
 # --- Install dependencies ---
-echo "Installing required packages..."
+echo -e "${INFO} Installing required packages..."
 apt install -y git nodejs npm chromium openssl curl patch
+echo -e "${SUCCESS} Required packages installed."
 
 # --- Clone or update repository ---
 REPO_DIR="whatsberry-public"
 REPO_URL="https://github.com/danzkigg/whatsberry-public.git"
 
 if [ -d "$REPO_DIR/.git" ]; then
-  echo "Repository already exists, updating..."
+  echo -e "${INFO} Repository already exists, updating..."
   cd "$REPO_DIR"
   git fetch --all
   git reset --hard origin/main
+  echo -e "${SUCCESS} Repository updated."
 else
-  echo "Cloning repository..."
+  echo -e "${INFO} Cloning repository..."
   git clone "$REPO_URL"
   cd "$REPO_DIR"
+  echo -e "${SUCCESS} Repository cloned."
 fi
 
 # --- Install Node.js dependencies ---
-echo "Installing node dependencies..."
+echo -e "${INFO} Installing Node.js dependencies..."
 PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm install
 npm install -g pm2
+echo -e "${SUCCESS} Node.js dependencies installed."
 
 # --- Generate .env if not exists ---
 if [ ! -f .env ]; then
-  echo "Creating .env file..."
+  echo -e "${INFO} Creating .env file..."
   API_KEY=$(openssl rand -hex 32)
 
   cat > .env <<EOF
@@ -48,9 +64,9 @@ PORT=3000
 API_KEY=$API_KEY
 EOF
 
-  echo "New API key generated: $API_KEY"
+  echo -e "${SUCCESS} New API key generated: $API_KEY"
 else
-  echo ".env file already exists, keeping existing configuration."
+  echo -e "${INFO} .env file already exists, keeping existing configuration."
   API_KEY=$(grep -E '^API_KEY=' .env | cut -d= -f2- || echo "(unknown)")
 fi
 
@@ -58,21 +74,23 @@ fi
 PATCH_FILE="termux_patch.diff"
 PATCH_URL="https://redsonbr140.github.io/termux-whatsberry-installer/patch/termux_patch.diff"
 
-echo "Downloading patch..."
+echo -e "${INFO} Downloading patch..."
 curl -fsSL "$PATCH_URL" -o "$PATCH_FILE"
 
 if git apply --check "$PATCH_FILE" >/dev/null 2>&1; then
-  echo "Applying patch..."
+  echo -e "${INFO} Applying patch..."
   git apply "$PATCH_FILE"
+  echo -e "${SUCCESS} Patch applied."
 else
-  echo "Patch already applied or cannot apply cleanly, skipping."
+  echo -e "${INFO} Patch already applied or cannot apply cleanly, skipping."
 fi
 
 # --- Start server ---
-echo "Starting server with PM2..."
+echo -e "${INFO} Starting server with PM2..."
 npm run pm2:start || pm2 restart all
+echo -e "${SUCCESS} Server started."
 
 echo
-echo "✅ Server installation complete!"
-echo "🔑 API Key: $API_KEY"
-echo "🚀 Directory: $(pwd)"
+echo -e "${GREEN}✅ Server installation complete!${NC}"
+echo -e "${YELLOW}🔑 API Key: $API_KEY${NC}"
+echo -e "${YELLOW}🚀 Directory: $(pwd)${NC}"
