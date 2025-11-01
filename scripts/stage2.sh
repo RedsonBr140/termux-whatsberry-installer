@@ -56,7 +56,7 @@ fi
 
 # --- Apply patch only if not already applied ---
 PATCH_FILE="termux_patch.diff"
-PATCH_URL="linktothepatch"
+PATCH_URL="https://redsonbr140.github.io/termux-whatsberry-installer/patch/termux_patch.diff"
 
 echo "Downloading patch..."
 curl -fsSL "$PATCH_URL" -o "$PATCH_FILE"
