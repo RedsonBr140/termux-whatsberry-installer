@@ -9,7 +9,11 @@ Install Whatsberry's server on your mobile phone via termux.
 ## Installation
 
 1. Open Termux on your Android device.
-2. Run the following command:
+2. Ensure your system is updated. The script tries to update it, but if the system tries to overwrite a file, it will fail.
+```bash
+pkg update && pkg upgrade
+```
+3. Run the following command:
 ```bash
 curl -fsSL https://redsonbr140.github.io/termux-whatsberry-installer/scripts/stage1.sh | sh
 ```
