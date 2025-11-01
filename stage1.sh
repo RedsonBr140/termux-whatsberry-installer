@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+echo "Stage 1: Run this script on termux"
+echo "Upgrading packages..."
+pkg upgrade -y
+echo "Installing proot-distro"
+pkg install -y proot-distro
+echo "Installing debian"
+proot-distro install debian
+echo "Debian is installed."
