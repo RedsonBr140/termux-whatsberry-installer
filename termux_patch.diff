@@ -1,0 +1,22 @@
+diff --git a/src/config/puppeteer.js b/src/config/puppeteer.js
+index 99ac42e..7d1f700 100644
+--- a/src/config/puppeteer.js
++++ b/src/config/puppeteer.js
+@@ -9,7 +9,7 @@ puppeteer.use(StealthPlugin());
+ function getPuppeteerConfig() {
+     return {
+         headless: 'new',
+-        executablePath: puppeteer.executablePath(),
++        executablePath: "/usr/bin/chromium",
+         args: [
+             '--no-sandbox',
+             '--disable-setuid-sandbox',
+@@ -28,7 +28,7 @@ function getPuppeteerConfig() {
+ function getFallbackPuppeteerConfig() {
+     return {
+         headless: true,
+-        executablePath: puppeteer.executablePath(),
++        executablePath: "/usr/bin/chromium",
+         timeout: 20000,
+         args: [
+             '--no-sandbox',
